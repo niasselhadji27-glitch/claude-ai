@@ -1,0 +1,854 @@
+<title>AdVault Studio — Live Demo</title>
+<style>
+  :root {
+    --bg: #f4f5f8;
+    --surface: #ffffff;
+    --surface-2: #eceef3;
+    --ink: #191c23;
+    --muted: #67707f;
+    --line: #dcdfe7;
+    --accent: #2545d3;
+    --accent-ink: #ffffff;
+    --accent-soft: #e6eafc;
+    --good: #14804a;
+    --good-soft: #dcf2e6;
+    --warn: #9a6700;
+    --warn-soft: #fbeeca;
+    --bad: #b3261e;
+    --bad-soft: #f9e0de;
+    --shadow: 0 1px 2px rgba(20, 24, 40, .06), 0 4px 16px rgba(20, 24, 40, .05);
+    --radius: 10px;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1116;
+      --surface: #171a21;
+      --surface-2: #1f242e;
+      --ink: #e8eaf0;
+      --muted: #8b93a5;
+      --line: #2a2f3a;
+      --accent: #7d93ff;
+      --accent-ink: #0f1116;
+      --accent-soft: #232c4d;
+      --good: #4cc38a;
+      --good-soft: #15302377;
+      --warn: #e3b341;
+      --warn-soft: #33290f77;
+      --bad: #f2726b;
+      --bad-soft: #3c1a1877;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 6px 20px rgba(0, 0, 0, .35);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f5f8; --surface: #ffffff; --surface-2: #eceef3; --ink: #191c23;
+    --muted: #67707f; --line: #dcdfe7; --accent: #2545d3; --accent-ink: #ffffff;
+    --accent-soft: #e6eafc; --good: #14804a; --good-soft: #dcf2e6;
+    --warn: #9a6700; --warn-soft: #fbeeca; --bad: #b3261e; --bad-soft: #f9e0de;
+    --shadow: 0 1px 2px rgba(20,24,40,.06), 0 4px 16px rgba(20,24,40,.05);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1116; --surface: #171a21; --surface-2: #1f242e; --ink: #e8eaf0;
+    --muted: #8b93a5; --line: #2a2f3a; --accent: #7d93ff; --accent-ink: #0f1116;
+    --accent-soft: #232c4d; --good: #4cc38a; --good-soft: #15302377;
+    --warn: #e3b341; --warn-soft: #33290f77; --bad: #f2726b; --bad-soft: #3c1a1877;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  button { font: inherit; cursor: pointer; }
+  input, select, textarea { font: inherit; color: inherit; }
+  a { color: inherit; }
+  ::placeholder { color: var(--muted); opacity: .7; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- shell ---------- */
+  #app { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 232px; flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--line);
+    display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh;
+  }
+  .wordmark {
+    display: flex; align-items: center; gap: 10px;
+    padding: 20px 18px 16px;
+    font-weight: 800; font-size: 15px; letter-spacing: -.02em;
+  }
+  .wordmark .mark {
+    width: 26px; height: 26px; border-radius: 7px;
+    background: var(--accent); color: var(--accent-ink);
+    display: grid; place-items: center; font-size: 13px; font-weight: 800;
+  }
+  .nav { display: flex; flex-direction: column; gap: 2px; padding: 6px 10px; flex: 1; }
+  .nav button {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border: 0; border-radius: 8px;
+    background: none; color: var(--muted); font-weight: 500;
+    text-align: left; width: 100%;
+  }
+  .nav button:hover { background: var(--surface-2); color: var(--ink); }
+  .nav button.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .nav svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .sidefoot { border-top: 1px solid var(--line); padding: 14px 16px; display: grid; gap: 8px; }
+  .creditrow { display: flex; align-items: center; justify-content: space-between; }
+  .creditnum { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; }
+  .planchip {
+    font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    background: var(--surface-2); color: var(--muted);
+    border-radius: 999px; padding: 2px 9px;
+  }
+  .sidefoot .email { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; }
+  .linkish { background: none; border: 0; color: var(--muted); font-size: 12px; padding: 0; text-align: left; }
+  .linkish:hover { color: var(--ink); text-decoration: underline; }
+
+  main { flex: 1; padding: 28px 32px 64px; min-width: 0; }
+  .pagehead { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+  .pagehead h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+  .pagehead .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+  /* ---------- primitives ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px; justify-content: center;
+    padding: 8px 14px; border-radius: 8px; border: 1px solid transparent;
+    font-weight: 600; font-size: 13px;
+    background: var(--accent); color: var(--accent-ink);
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn.ghost { background: none; color: var(--muted); }
+  .btn.ghost:hover { background: var(--surface-2); color: var(--ink); filter: none; }
+  .btn.outline { background: var(--surface); color: var(--ink); border-color: var(--line); }
+  .btn.outline:hover { background: var(--surface-2); filter: none; }
+  .btn.sm { padding: 5px 10px; font-size: 12px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow);
+  }
+  .card .pad { padding: 18px; }
+  .card h3 { margin: 0 0 4px; font-size: 15px; font-weight: 700; }
+  .card .desc { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+  .field { display: grid; gap: 6px; margin-bottom: 14px; }
+  .field label { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: .02em; }
+  .input, select.input, textarea.input {
+    width: 100%; padding: 8px 11px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--bg);
+  }
+  textarea.input { resize: vertical; line-height: 1.6; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600; letter-spacing: .03em;
+    border-radius: 999px; padding: 3px 10px; text-transform: capitalize;
+  }
+  .pill.queued, .pill.draft { background: var(--surface-2); color: var(--muted); }
+  .pill.processing, .pill.rendering { background: var(--warn-soft); color: var(--warn); }
+  .pill.completed { background: var(--good-soft); color: var(--good); }
+  .pill.failed { background: var(--bad-soft); color: var(--bad); }
+  .pill.media { background: var(--accent-soft); color: var(--accent); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  .pill.processing .dot, .pill.rendering .dot { animation: pulse 1.2s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+
+  /* ---------- login ---------- */
+  .login-wrap { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+  .login-card { width: 100%; max-width: 400px; }
+  .login-card .wordmark { padding: 0 0 18px; font-size: 17px; }
+  .login-note {
+    margin-top: 14px; font-size: 12px; color: var(--muted);
+    background: var(--surface-2); border-radius: 8px; padding: 10px 12px;
+  }
+
+  /* ---------- swipe file ---------- */
+  .boards { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+  .boardpill {
+    border: 1px solid var(--line); background: var(--surface); color: var(--muted);
+    border-radius: 999px; padding: 5px 13px; font-size: 13px; font-weight: 500;
+  }
+  .boardpill:hover { color: var(--ink); }
+  .boardpill.active { background: var(--ink); border-color: var(--ink); color: var(--bg); font-weight: 600; }
+  .masonry { column-count: 1; column-gap: 16px; }
+  @media (min-width: 760px)  { .masonry { column-count: 2; } }
+  @media (min-width: 1100px) { .masonry { column-count: 3; } }
+  @media (min-width: 1500px) { .masonry { column-count: 4; } }
+  .adcard { break-inside: avoid; margin-bottom: 16px; overflow: hidden; cursor: pointer; transition: box-shadow .15s; display: block; width: 100%; text-align: left; padding: 0; border: 1px solid var(--line); }
+  .adcard:hover { box-shadow: 0 4px 20px rgba(20,24,40,.13); }
+  .adcard .thumb { display: block; width: 100%; }
+  .adcard .meta { padding: 13px 15px 15px; }
+  .adcard .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .adcard .brand { font-weight: 700; font-size: 13.5px; }
+  .adcard .copy { color: var(--muted); font-size: 12.5px; margin: 7px 0 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .adcard .when { font-family: var(--mono); font-size: 10.5px; color: var(--muted); margin-top: 10px; opacity: .8; }
+  .empty {
+    border: 1.5px dashed var(--line); border-radius: var(--radius);
+    padding: 56px 24px; text-align: center; color: var(--muted); background: var(--surface);
+  }
+  .empty h2 { color: var(--ink); font-size: 15px; margin: 0 0 4px; }
+
+  /* ---------- studio ---------- */
+  .backlink { background: none; border: 0; color: var(--muted); font-size: 13px; padding: 0; margin-bottom: 14px; display: inline-flex; gap: 6px; align-items: center; }
+  .backlink:hover { color: var(--ink); }
+  .studio { display: grid; gap: 20px; grid-template-columns: 1fr; align-items: start; }
+  @media (min-width: 1000px) { .studio { grid-template-columns: minmax(320px, 5fr) 7fr; } }
+  .original .thumb { width: 100%; border-radius: 8px; display: block; margin-bottom: 14px; }
+  .original h4, .variation h4 { margin: 14px 0 4px; font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+  .original p { margin: 0; white-space: pre-wrap; font-size: 13.5px; }
+  .genrow { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; }
+  .genrow .field { flex: 1; min-width: 220px; margin: 0; }
+  .variation { margin-top: 16px; }
+  .variation .vhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .variation .vhead strong { font-size: 14px; }
+  .variation textarea { min-height: 150px; width: 100%; }
+  .spin {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid currentColor; border-top-color: transparent;
+    animation: rot .7s linear infinite; display: inline-block;
+  }
+  @keyframes rot { to { transform: rotate(360deg); } }
+
+  /* ---------- jobs / renders ---------- */
+  .joblist { display: grid; gap: 0; }
+  .jobrow { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .jobrow:first-child { border-top: 0; }
+  .jobrow .q { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .jobrow .t { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .rendergrid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+  .rendercard { overflow: hidden; }
+  .rendercard .screen {
+    aspect-ratio: 16/9; display: grid; place-items: center; position: relative;
+    background: linear-gradient(135deg, #1b2440, #2545d3 60%, #7d93ff);
+    color: #fff;
+  }
+  .rendercard .screen.idle { background: var(--surface-2); color: var(--muted); }
+  .rendercard .screen .play {
+    width: 44px; height: 44px; border-radius: 50%; border: 0;
+    background: rgba(255,255,255,.92); color: #1b2440;
+    display: grid; place-items: center; font-size: 15px;
+  }
+  .progress { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(255,255,255,.25); }
+  .progress i { display: block; height: 100%; background: #fff; transition: width .5s linear; }
+  .rendercard .meta { padding: 12px 14px 14px; }
+  .rendercard .meta .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+  /* ---------- settings ---------- */
+  .plans { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+  .plan .price { font-size: 24px; font-weight: 800; letter-spacing: -.02em; margin: 6px 0 2px; }
+  .plan .cr { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .kv { display: grid; gap: 8px; font-size: 13.5px; }
+  .kv div { display: flex; gap: 8px; align-items: center; }
+  .kv span:first-child { color: var(--muted); min-width: 130px; }
+
+  /* ---------- toast ---------- */
+  #toasts { position: fixed; right: 18px; bottom: 18px; display: grid; gap: 8px; z-index: 50; }
+  .toast {
+    background: var(--ink); color: var(--bg);
+    padding: 10px 15px; border-radius: 9px; font-size: 13px; font-weight: 500;
+    box-shadow: var(--shadow); max-width: 340px;
+  }
+  .toast.err { background: var(--bad); color: #fff; }
+
+  .demo-banner {
+    position: fixed; left: 50%; transform: translateX(-50%);
+    bottom: 14px; z-index: 40;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px 16px; font-size: 12px; color: var(--muted); box-shadow: var(--shadow);
+  }
+  @media (max-width: 900px) {
+    .sidebar { width: 64px; }
+    .sidebar .wordmark span.txt, .nav button span, .sidefoot { display: none; }
+    main { padding: 20px 16px 80px; }
+  }
+</style>
+
+<div id="app"></div>
+<div id="toasts"></div>
+
+<script>
+"use strict";
+
+/* ============================== data ============================== */
+
+const KEY = "advault-demo-v2";
+
+const PALETTES = [
+  ["#1c2f5e", "#4468d9"], ["#5e2740", "#d9446e"], ["#1f4d3c", "#3aa377"],
+  ["#5a3a14", "#d99a3a"], ["#2f2a52", "#7d6bd9"], ["#14424d", "#3aabc2"]
+];
+
+function thumbSVG(brand, seed, ratio) {
+  const [c1, c2] = PALETTES[seed % PALETTES.length];
+  const h = ratio === "tall" ? 320 : ratio === "square" ? 240 : 160;
+  const initial = brand.slice(0, 1).toUpperCase();
+  return `<svg class="thumb" viewBox="0 0 240 ${h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${brand} ad creative">
+    <defs><linearGradient id="g${seed}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/>
+    </linearGradient></defs>
+    <rect width="240" height="${h}" fill="url(#g${seed})"/>
+    <circle cx="${40 + (seed * 37) % 160}" cy="${h - 40 - (seed * 23) % 60}" r="${34 + (seed * 11) % 26}" fill="rgba(255,255,255,.14)"/>
+    <circle cx="${190 - (seed * 29) % 120}" cy="${30 + (seed * 17) % 50}" r="${18 + (seed * 7) % 18}" fill="rgba(255,255,255,.10)"/>
+    <text x="20" y="${h - 20}" font-family="system-ui,sans-serif" font-size="26" font-weight="800" fill="rgba(255,255,255,.95)">${initial}</text>
+    <g transform="translate(${120 - 14}, ${h / 2 - 14})" opacity=".9">
+      <circle cx="14" cy="14" r="14" fill="rgba(255,255,255,.9)"/>
+      <path d="M11 8.5 L20 14 L11 19.5 Z" fill="${c1}"/>
+    </g>
+  </svg>`;
+}
+
+const SEED = {
+  credits: 10,
+  tier: "free",
+  email: "",
+  boards: [
+    { id: "b1", name: "Skincare angles" },
+    { id: "b2", name: "UGC winners" }
+  ],
+  ads: [
+    {
+      id: "a1", page: "Lumen Skin", board: "b1", media: "video", ratio: "tall", seed: 0,
+      copy: "POV: you finally found a vitamin C serum that doesn't pill under sunscreen. 30,000+ five-star reviews and counting. ☀️",
+      transcript: "Okay, I need to talk about this because nobody warned me. I spent two years buying vitamin C serums that pilled the second I put SPF on top. Then my derm told me the problem isn't the vitamin C — it's the silicone base. Lumen's serum is water-anchored, so it actually absorbs. I've used it every morning for three months and the dark spots on my cheek are basically gone. If you wear sunscreen daily — and you should — this is the one. Tap below, they do a 60-day money-back thing so it's genuinely risk-free.",
+      cta: "Shop Now", started: "Mar 14, 2026", libId: "128843317750112"
+    },
+    {
+      id: "a2", page: "PeakFuel", board: "b2", media: "video", ratio: "square", seed: 1,
+      copy: "The 3pm crash isn't a willpower problem. It's a blood sugar problem. Fix the input, fix the afternoon.",
+      transcript: "Here's what nobody tells you about the 3pm crash: it starts at breakfast. You eat fast carbs at 8am, your blood sugar spikes, insulin overcorrects, and by mid-afternoon you're face down at your desk. PeakFuel is a slow-release protein oat blend — 24 grams of protein, zero added sugar, ready in 90 seconds. I switched my breakfast six weeks ago and I haven't touched an afternoon coffee since. First order is 40% off with the link below.",
+      cta: "Get Offer", started: "Apr 2, 2026", libId: "77120938455201"
+    },
+    {
+      id: "a3", page: "Nordwind Gear", board: null, media: "image", ratio: "tall", seed: 2,
+      copy: "Rated 4.9★ by 12,000 commuters. The Fjord backpack — waterproof, 21 pockets, lifetime warranty. Ships free this week.",
+      transcript: null,
+      cta: "Shop Now", started: "Feb 28, 2026", libId: "99230117884632"
+    },
+    {
+      id: "a4", page: "Halo Home", board: null, media: "video", ratio: "wide", seed: 3,
+      copy: "We put a chef's knife through a $39 sharpener. The results shocked our own product team.",
+      transcript: "This knife hasn't been sharpened in four years. Watch this. [pause] That's one pass through the Halo Pro sharpener. Tomato test — clean slice, no crushing. The secret is the ceramic angle guide: it holds a perfect fifteen degrees so you literally cannot mess it up. Professional sharpening costs twenty dollars per knife, per visit. This is thirty-nine dollars once, for every knife you own, forever. Link's below — thank us at dinner.",
+      cta: "Learn More", started: "May 9, 2026", libId: "31558824119907"
+    },
+    {
+      id: "a5", page: "Brightloop", board: "b2", media: "video", ratio: "square", seed: 4,
+      copy: "My therapist told me to journal. My ADHD said no. This app fixed the standoff — 2 minutes a day, out loud.",
+      transcript: "I bought four paper journals last year. Combined entries: nine. The problem was never motivation, it's that blank pages are terrifying. Brightloop asks you one question a day and you answer out loud — it transcribes, tags the themes, and shows you patterns week over week. Day 40 for me, longest streak of anything ever. It's free to start, and honestly the weekly recap alone is worth the subscription.",
+      cta: "Install Now", started: "Jan 19, 2026", libId: "84772201356690"
+    },
+    {
+      id: "a6", page: "Kinfolk Coffee", board: null, media: "image", ratio: "square", seed: 5,
+      copy: "Your coffee is stale 12 days after roasting. Ours ships within 48 hours of the roast — subscribe and never taste cardboard again.",
+      transcript: null,
+      cta: "Subscribe", started: "Jun 1, 2026", libId: "20938471100238"
+    }
+  ],
+  scripts: [],
+  renders: [],
+  jobs: []
+};
+
+const VOICES = [
+  { id: "v1", name: "Rachel — warm, conversational" },
+  { id: "v2", name: "Marcus — deep, authoritative" },
+  { id: "v3", name: "June — bright, energetic UGC" }
+];
+
+const ANGLES = [
+  "Direct response (problem → agitate → solve)",
+  "UGC testimonial style",
+  "Founder story / behind the brand",
+  "Educational hook (did-you-know)"
+];
+
+/* --- canned script generator (stands in for GPT-4o) --- */
+const HOOKS = {
+  0: [p => `Stop scrolling if you've ever wasted money on ${p.cat}.`,
+      p => `There's a reason 12,000 people switched to ${p.brand} last month.`,
+      p => `I'm about to save you from the biggest ${p.cat} mistake out there.`],
+  1: [p => `Okay so I wasn't going to post this, but ${p.brand} changed my mind.`,
+      p => `Three weeks ago my friend would not shut up about ${p.brand}. Now I get it.`,
+      p => `POV: you finally try the ${p.cat} everyone's been talking about.`],
+  2: [p => `When we started ${p.brand}, everyone said the ${p.cat} market was full.`,
+      p => `I maxed out two credit cards building the first batch of this.`,
+      p => `Our first hundred customers were friends doing us a favor. The next hundred thousand weren't.`],
+  3: [p => `Did you know most ${p.cat} fails for one boring reason?`,
+      p => `Here's what the ${p.cat} industry hopes you never find out.`,
+      p => `Quick science lesson that will change how you buy ${p.cat}.`]
+};
+const CATS = { a1: "skincare", a2: "breakfast", a3: "backpacks", a4: "kitchen tools", a5: "journaling apps", a6: "coffee" };
+
+function genScripts(ad, angleIdx) {
+  const p = { brand: ad.page, cat: CATS[ad.id] || "products" };
+  const hooks = HOOKS[angleIdx] || HOOKS[0];
+  const middles = [
+    `Here's the thing: ${ad.copy.split(".")[0].toLowerCase()}. Most people accept that as normal — it isn't. ${p.brand} was built around fixing exactly this, and the difference shows up in week one.`,
+    `The reviews say it better than I can — people call it the first ${p.cat} purchase they'd actually rebuy. What makes it work is the details you can't see in an ad: the sourcing, the testing, the guarantee.`,
+    `I was skeptical too. Then I looked at what it replaces: the wasted money, the workarounds, the settling. ${p.brand} costs less than the problem does.`
+  ];
+  const closers = [
+    `Tap ${ad.cta ? `"${ad.cta}"` : "below"} — there's a money-back guarantee, so the only risk is staying where you are.`,
+    `The link below has the best offer they run. If you've read this far, that's your sign.`,
+    `${ad.cta ?? "Shop"} now — your future self will wonder why you waited.`
+  ];
+  const titles = ["Hook-first cut", "Social proof cut", "Skeptic's cut"];
+  return [0, 1, 2].map(i => ({
+    title: `${titles[i]}`,
+    content: `${hooks[i % hooks.length](p)}\n\n${middles[i]}\n\n${closers[i]}`
+  }));
+}
+
+const SCRAPE_RESULTS = [
+  { page: "Verve Athletics", media: "video", ratio: "tall", copy: "These leggings survived 200 washes in our lab. We filmed every single one.", transcript: "Wash number one. Wash number fifty. Wash two hundred. Same fit, same color, zero pilling. Verve's compression fabric is knitted, not printed, so the shape is built into the yarn itself. Try them for thirty days — sweat in them, wash them wrong, do your worst. If they let you down, full refund.", cta: "Shop Now" },
+  { page: "Verve Athletics", media: "image", ratio: "square", copy: "4.8★ · 31,000 reviews · The last leggings you'll buy this decade.", transcript: null, cta: "Shop Now" },
+  { page: "Verve Athletics", media: "video", ratio: "square", copy: "My PT recommended these after my third pair of big-brand leggings went sheer. Listen to your PT.", transcript: "My physical therapist — hi Dana — told me to stop buying leggings based on the logo. She trains people all day and every serious lifter she knows wears Verve. Squat-proof was the bar, and they cleared it on day one. Code DANA gets you fifteen percent off.", cta: "Get Offer" }
+];
+
+/* ============================== state ============================== */
+
+let S;
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) {
+      S = JSON.parse(raw);
+      // finish any render that was mid-flight when the page was closed
+      S.renders.forEach(r => { if (r.status === "rendering") { r.status = "completed"; r.progress = 100; } });
+      S.jobs.forEach(j => { if (j.status === "processing") { j.status = "failed"; j.error = "Interrupted — try again"; } });
+      return;
+    }
+  } catch (e) { /* fall through to seed */ }
+  S = JSON.parse(JSON.stringify(SEED));
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage may be unavailable */ } }
+load();
+
+let nextId = Date.now();
+const uid = pre => `${pre}${(nextId++).toString(36)}`;
+
+/* ============================== helpers ============================== */
+
+const $ = sel => document.querySelector(sel);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function toast(msg, err) {
+  const el = document.createElement("div");
+  el.className = "toast" + (err ? " err" : "");
+  el.textContent = msg;
+  $("#toasts").appendChild(el);
+  setTimeout(() => el.remove(), 3600);
+}
+
+function spend(n, what) {
+  if (S.credits < n) {
+    toast(`Not enough credits for this ${what} (${n} needed). Upgrade in Settings.`, true);
+    return false;
+  }
+  S.credits -= n;
+  save();
+  const c = $("#creditnum"); if (c) c.textContent = S.credits;
+  return true;
+}
+
+const fmtTime = ts => new Date(ts).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+
+const ICONS = {
+  grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+  clap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="m3 8 2.5-4.5L21 6l-1 2M8.5 4.6 7 8m6.5-3.2L12 8"/></svg>',
+  gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2-1.2L14.2 3H9.8l-.4 2.7a7 7 0 0 0-2 1.2l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2 1.2l.4 2.7h4.4l.4-2.7a7 7 0 0 0 2-1.2l2.3 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2Z"/></svg>'
+};
+
+/* ============================== views ============================== */
+
+function route() {
+  if (!S.email) { renderLogin(); return; }
+  const hash = location.hash || "#/dashboard";
+  const [, view, param] = hash.split("/");
+  const views = { dashboard: renderDashboard, scrape: renderScrape, ads: renderStudio, renders: param && param.startsWith("new") ? renderWizard : renderRenders, settings: renderSettings };
+  (views[view] || renderDashboard)(param);
+}
+
+function shell(active, inner) {
+  $("#app").innerHTML = `
+    <nav class="sidebar" aria-label="Main">
+      <div class="wordmark"><span class="mark">A</span><span class="txt">AdVault Studio</span></div>
+      <div class="nav">
+        ${[["dashboard", "Swipe File", "grid"], ["scrape", "Scrape Ads", "search"], ["renders", "Renders", "clap"], ["settings", "Settings", "gear"]]
+          .map(([id, label, ic]) => `<button data-nav="${id}" class="${active === id ? "active" : ""}">${ICONS[ic]}<span>${label}</span></button>`).join("")}
+      </div>
+      <div class="sidefoot">
+        <div class="creditrow"><span class="creditnum" style="font-size:13px"><span id="creditnum">${S.credits}</span> credits</span><span class="planchip">${esc(S.tier)}</span></div>
+        <span class="email">${esc(S.email)}</span>
+        <button class="linkish" id="signout">Sign out</button>
+      </div>
+    </nav>
+    <main>${inner}</main>
+    <div class="demo-banner">Demo build — data lives in your browser · providers are simulated</div>`;
+  document.querySelectorAll("[data-nav]").forEach(b =>
+    b.addEventListener("click", () => { location.hash = "#/" + b.dataset.nav; }));
+  $("#signout").addEventListener("click", () => { S.email = ""; save(); route(); });
+}
+
+/* ---------- login ---------- */
+function renderLogin() {
+  $("#app").innerHTML = `
+    <div class="login-wrap">
+      <div class="login-card">
+        <div class="wordmark"><span class="mark">A</span><span>AdVault Studio</span></div>
+        <div class="card"><div class="pad">
+          <h3>Welcome back</h3>
+          <p class="desc">Log in to your swipe file and studio.</p>
+          <form id="loginform">
+            <div class="field"><label for="em">Email</label>
+              <input id="em" class="input" type="email" required placeholder="you@agency.com"></div>
+            <div class="field"><label for="pw">Password</label>
+              <input id="pw" class="input" type="password" required minlength="4" placeholder="••••••••"></div>
+            <button class="btn" style="width:100%" type="submit">Log in</button>
+          </form>
+          <div class="login-note">This is the demo build: any email and password works, and your account starts with <strong>10 free credits</strong>. In production this screen is Supabase Auth with email confirmation.</div>
+        </div></div>
+      </div>
+    </div>`;
+  $("#loginform").addEventListener("submit", e => {
+    e.preventDefault();
+    S.email = $("#em").value.trim();
+    save();
+    location.hash = "#/dashboard";
+    route();
+    toast("Welcome to AdVault Studio 👋");
+  });
+}
+
+/* ---------- dashboard ---------- */
+let activeBoard = null;
+function renderDashboard() {
+  const ads = activeBoard ? S.ads.filter(a => a.board === activeBoard) : S.ads;
+  const boardPills = [`<button class="boardpill ${!activeBoard ? "active" : ""}" data-board="">All ads</button>`]
+    .concat(S.boards.map(b => `<button class="boardpill ${activeBoard === b.id ? "active" : ""}" data-board="${b.id}">${esc(b.name)}</button>`))
+    .join("");
+  const grid = ads.length === 0
+    ? `<div class="empty"><h2>No ads here yet</h2><p style="margin:4px 0 16px">Scrape a competitor from the Meta Ad Library to fill this board.</p><button class="btn" data-nav-scrape>Scrape your first ad</button></div>`
+    : `<div class="masonry">${ads.map(a => `
+        <button class="card adcard" data-ad="${a.id}">
+          ${thumbSVG(a.page, a.seed, a.ratio)}
+          <span class="meta" style="display:block">
+            <span class="row"><span class="brand">${esc(a.page)}</span><span class="pill media">${a.media}</span></span>
+            <span class="copy" style="display:-webkit-box">${esc(a.copy)}</span>
+            <span class="when" style="display:block">Started ${esc(a.started)} · ID ${a.libId}</span>
+          </span>
+        </button>`).join("")}</div>`;
+
+  shell("dashboard", `
+    <div class="pagehead">
+      <div><h1>Swipe File</h1><div class="sub">${ads.length} saved ad${ads.length === 1 ? "" : "s"}</div></div>
+      <button class="btn" data-nav-scrape>+ Scrape new ads</button>
+    </div>
+    <div class="boards">${boardPills}
+      <button class="boardpill" id="newboard" style="border-style:dashed">+ New board</button>
+    </div>
+    ${grid}`);
+
+  document.querySelectorAll("[data-board]").forEach(b =>
+    b.addEventListener("click", () => { activeBoard = b.dataset.board || null; renderDashboard(); }));
+  document.querySelectorAll("[data-nav-scrape]").forEach(b =>
+    b.addEventListener("click", () => { location.hash = "#/scrape"; }));
+  document.querySelectorAll("[data-ad]").forEach(b =>
+    b.addEventListener("click", () => { location.hash = "#/ads/" + b.dataset.ad; }));
+  $("#newboard").addEventListener("click", () => {
+    const name = prompt("Board name");
+    if (!name || !name.trim()) return;
+    S.boards.push({ id: uid("b"), name: name.trim().slice(0, 40) });
+    save(); renderDashboard(); toast(`Board "${name.trim()}" created`);
+  });
+}
+
+/* ---------- scrape ---------- */
+function renderScrape() {
+  const rows = S.jobs.slice().reverse().map(j => `
+    <div class="jobrow">
+      <div style="min-width:0"><div class="q">${esc(j.query)}</div>
+        <div class="t">${fmtTime(j.at)}${j.error ? " — " + esc(j.error) : ""}${j.count != null ? ` — ${j.count} ads saved` : ""}</div></div>
+      <span class="pill ${j.status}"><span class="dot"></span>${j.status}</span>
+    </div>`).join("");
+
+  shell("scrape", `
+    <div class="pagehead"><div><h1>Scrape Ads</h1><div class="sub">Pull winning creatives straight from the Meta Ad Library</div></div></div>
+    <div style="max-width:640px; display:grid; gap:16px">
+      <div class="card"><div class="pad">
+        <h3>New scrape</h3>
+        <p class="desc">Paste an Ad Library URL or type a competitor's page name. Costs <strong>1 credit</strong>.</p>
+        <form id="scrapeform">
+          <div class="field"><label for="q">Ad Library URL or competitor name</label>
+            <input id="q" class="input" required placeholder='https://www.facebook.com/ads/library/?id=… or "Verve Athletics"'></div>
+          <button class="btn" type="submit">Start scrape</button>
+        </form>
+      </div></div>
+      ${S.jobs.length ? `<div class="card"><div class="pad"><h3>Recent jobs</h3><div class="joblist" style="margin-top:8px">${rows}</div></div></div>` : ""}
+    </div>`);
+
+  $("#scrapeform").addEventListener("submit", e => {
+    e.preventDefault();
+    const q = $("#q").value.trim();
+    if (!q) return;
+    if (!spend(1, "scrape")) return;
+    const job = { id: uid("j"), query: q, status: "processing", at: Date.now(), count: null, error: null };
+    S.jobs.push(job); save(); renderScrape();
+    toast("Scrape queued — the headless browser is on it");
+    setTimeout(() => {
+      const found = SCRAPE_RESULTS.map((r, i) => ({
+        id: uid("a"), page: q.startsWith("http") ? r.page : q, board: null,
+        media: r.media, ratio: r.ratio, seed: (S.ads.length + i) % 6,
+        copy: r.copy, transcript: r.transcript, cta: r.cta,
+        started: "Jul 2026", libId: String(Math.floor(1e13 + Math.random() * 9e13))
+      }));
+      S.ads = found.concat(S.ads);
+      job.status = "completed"; job.count = found.length;
+      save();
+      if ((location.hash || "#/dashboard").includes("scrape")) renderScrape();
+      toast(`Scrape finished — ${found.length} ads added to your swipe file`);
+    }, 5000);
+  });
+}
+
+/* ---------- studio ---------- */
+function renderStudio(adId) {
+  const ad = S.ads.find(a => a.id === adId);
+  if (!ad) { location.hash = "#/dashboard"; return; }
+  const myScripts = S.scripts.filter(s => s.adId === ad.id).slice().reverse();
+
+  shell("dashboard", `
+    <button class="backlink" id="back">← Back to swipe file</button>
+    <div class="pagehead"><div><h1>${esc(ad.page)}</h1>
+      <div class="sub">Library ID ${ad.libId} · started ${esc(ad.started)} · <span class="pill media">${ad.media}</span></div></div></div>
+    <div class="studio">
+      <div class="card original"><div class="pad">
+        ${thumbSVG(ad.page, ad.seed, ad.ratio)}
+        <h4>Ad copy</h4><p>${esc(ad.copy)}</p>
+        <h4>Transcript</h4>
+        ${ad.transcript ? `<p>${esc(ad.transcript)}</p>` : `<p style="color:var(--muted);font-style:italic">No transcript — this is a static ${ad.media} ad. Video ads are auto-transcribed after scraping.</p>`}
+      </div></div>
+      <div>
+        <div class="card"><div class="pad">
+          <h3>✦ Generate scripts</h3>
+          <p class="desc">GPT-4o writes 3 fresh variations from the original. Costs <strong>1 credit</strong>.</p>
+          <div class="genrow">
+            <div class="field"><label for="angle">Creative angle</label>
+              <select id="angle" class="input">${ANGLES.map((a, i) => `<option value="${i}">${a}</option>`).join("")}</select></div>
+            <button class="btn" id="gen">Generate 3 variations</button>
+          </div>
+        </div></div>
+        <div id="variations">${myScripts.map(variationHTML).join("")}</div>
+      </div>
+    </div>`);
+
+  $("#back").addEventListener("click", () => { location.hash = "#/dashboard"; });
+  $("#gen").addEventListener("click", () => {
+    if (!ad.transcript && !ad.copy) { toast("This ad has nothing to work from yet.", true); return; }
+    if (!spend(1, "generation")) return;
+    const btn = $("#gen");
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Writing…';
+    setTimeout(() => {
+      const angleIdx = Number($("#angle").value);
+      const three = genScripts(ad, angleIdx).map((v, i) => ({
+        id: uid("s"), adId: ad.id, title: v.title, content: v.content,
+        n: i + 1, angle: ANGLES[angleIdx], edited: false
+      }));
+      S.scripts = S.scripts.concat(three); save();
+      renderStudio(ad.id);
+      toast("3 new variations ready");
+    }, 2400);
+  });
+  wireVariations(ad);
+}
+
+function variationHTML(s) {
+  return `<div class="card variation"><div class="pad">
+    <div class="vhead"><strong>${esc(s.title)}</strong>
+      <span style="display:flex;gap:8px;align-items:center">
+        ${s.edited ? '<span class="pill queued">edited</span>' : ""}
+        <button class="btn sm outline" data-render="${s.id}">🎬 Render</button>
+      </span></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">${esc(s.angle)}</div>
+    <textarea class="input" data-edit="${s.id}">${esc(s.content)}</textarea>
+    <div style="display:flex;justify-content:flex-end;margin-top:8px">
+      <button class="btn sm ghost" data-save="${s.id}" disabled>Save changes</button></div>
+  </div></div>`;
+}
+
+function wireVariations(ad) {
+  document.querySelectorAll("[data-edit]").forEach(t => {
+    t.addEventListener("input", () => {
+      const b = document.querySelector(`[data-save="${t.dataset.edit}"]`);
+      if (b) b.disabled = false;
+    });
+  });
+  document.querySelectorAll("[data-save]").forEach(b => {
+    b.addEventListener("click", () => {
+      const s = S.scripts.find(x => x.id === b.dataset.save);
+      const t = document.querySelector(`[data-edit="${b.dataset.save}"]`);
+      if (s && t) { s.content = t.value; s.edited = true; save(); b.disabled = true; toast("Script saved"); }
+    });
+  });
+  document.querySelectorAll("[data-render]").forEach(b => {
+    b.addEventListener("click", () => { location.hash = "#/renders/new?" + b.dataset.render; });
+  });
+}
+
+/* ---------- render wizard ---------- */
+function renderWizard() {
+  const pre = (location.hash.split("?")[1] || "");
+  if (S.scripts.length === 0) {
+    shell("renders", `
+      <div class="pagehead"><div><h1>New Render</h1></div></div>
+      <div class="empty" style="max-width:560px"><h2>No scripts yet</h2>
+        <p style="margin:4px 0 16px">Open an ad in your swipe file and generate scripts in the Studio first.</p>
+        <button class="btn" id="goDash">Go to swipe file</button></div>`);
+    $("#goDash").addEventListener("click", () => { location.hash = "#/dashboard"; });
+    return;
+  }
+  const opts = S.scripts.slice().reverse().map(s => {
+    const ad = S.ads.find(a => a.id === s.adId);
+    return `<option value="${s.id}" ${s.id === pre ? "selected" : ""}>${esc(ad ? ad.page : "Ad")} — ${esc(s.title)}</option>`;
+  }).join("");
+
+  shell("renders", `
+    <button class="backlink" id="back">← All renders</button>
+    <div class="pagehead"><div><h1>New Render</h1><div class="sub">Script → voiceover → footage → finished ad</div></div></div>
+    <div style="max-width:640px;display:grid;gap:16px">
+      <div class="card"><div class="pad"><h3>1 · Choose a script</h3>
+        <div class="field" style="margin-top:10px"><select id="wscript" class="input">${opts}</select></div>
+        <p id="wpreview" style="white-space:pre-wrap;background:var(--bg);border-radius:8px;padding:12px;font-size:13px;color:var(--muted);max-height:130px;overflow:auto;margin:0"></p>
+      </div></div>
+      <div class="card"><div class="pad"><h3>2 · Pick a voiceover</h3>
+        <p class="desc">AI voices powered by ElevenLabs.</p>
+        <div class="field"><select id="wvoice" class="input">${VOICES.map(v => `<option value="${v.id}">${v.name}</option>`).join("")}</select></div>
+      </div></div>
+      <div class="card"><div class="pad"><h3>3 · Background footage <span style="font-weight:400;color:var(--muted)">(optional)</span></h3>
+        <label for="wfile" style="display:flex;flex-direction:column;align-items:center;gap:4px;border:1.5px dashed var(--line);border-radius:8px;padding:26px;cursor:pointer">
+          <strong id="wfilename" style="font-size:13px">Click to choose a file</strong>
+          <span style="font-size:11.5px;color:var(--muted)">MP4, MOV, PNG or JPG · max 200 MB</span></label>
+        <input id="wfile" type="file" accept="video/*,image/png,image/jpeg" style="display:none">
+      </div></div>
+      <button class="btn" id="wgo" style="padding:12px">Render video · 5 credits</button>
+    </div>`);
+
+  const preview = () => {
+    const s = S.scripts.find(x => x.id === $("#wscript").value);
+    $("#wpreview").textContent = s ? s.content : "";
+  };
+  preview();
+  $("#wscript").addEventListener("change", preview);
+  $("#back").addEventListener("click", () => { location.hash = "#/renders"; });
+  $("#wfile").addEventListener("change", e => {
+    const f = e.target.files[0];
+    $("#wfilename").textContent = f ? f.name : "Click to choose a file";
+  });
+  $("#wgo").addEventListener("click", () => {
+    if (!spend(5, "render")) return;
+    const s = S.scripts.find(x => x.id === $("#wscript").value);
+    const v = VOICES.find(x => x.id === $("#wvoice").value);
+    const r = { id: uid("r"), scriptId: s.id, title: s.title, page: (S.ads.find(a => a.id === s.adId) || {}).page || "Ad",
+                voice: v.name.split(" —")[0], status: "rendering", progress: 4, at: Date.now() };
+    S.renders.unshift(r); save();
+    location.hash = "#/renders";
+    toast("Voiceover generated — Creatomate is rendering your video");
+    const tick = setInterval(() => {
+      r.progress = Math.min(100, r.progress + 8 + Math.random() * 10);
+      if (r.progress >= 100) { r.status = "completed"; clearInterval(tick); toast("Render complete 🎬"); }
+      save();
+      if ((location.hash || "").includes("renders") && !(location.hash || "").includes("new")) renderRenders();
+    }, 900);
+  });
+}
+
+/* ---------- renders list ---------- */
+function renderRenders() {
+  const cards = S.renders.map(r => `
+    <div class="card rendercard">
+      <div class="screen ${r.status === "completed" ? "" : "idle"}">
+        ${r.status === "completed"
+          ? `<button class="play" data-play aria-label="Play render">▶</button>`
+          : `<span style="font-size:12px">Rendering… <span class="creditnum">${Math.round(r.progress)}%</span></span>
+             <div class="progress"><i style="width:${r.progress}%"></i></div>`}
+      </div>
+      <div class="meta">
+        <div class="row"><strong style="font-size:13px">${esc(r.page)} · ${esc(r.title)}</strong>
+          <span class="pill ${r.status}"><span class="dot"></span>${r.status}</span></div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:6px">
+          ${esc(r.voice)} · ${fmtTime(r.at)}</div>
+      </div>
+    </div>`).join("");
+
+  shell("renders", `
+    <div class="pagehead">
+      <div><h1>Renders</h1><div class="sub">${S.renders.length} video${S.renders.length === 1 ? "" : "s"}</div></div>
+      <button class="btn" id="newr">🎬 New render</button>
+    </div>
+    ${S.renders.length ? `<div class="rendergrid">${cards}</div>`
+      : `<div class="empty"><h2>No renders yet</h2><p style="margin:4px 0 16px">Generate a script in the Studio, then render it into a finished video ad.</p><button class="btn" id="newr2">Create your first render</button></div>`}`);
+
+  document.querySelectorAll("#newr,#newr2").forEach(b =>
+    b && b.addEventListener("click", () => { location.hash = "#/renders/new"; }));
+  document.querySelectorAll("[data-play]").forEach(b =>
+    b.addEventListener("click", () => toast("Demo build — connect Creatomate to get real MP4 output")));
+}
+
+/* ---------- settings ---------- */
+function renderSettings() {
+  const plans = [
+    ["starter", "Starter", "$29/mo", 100, "For solo media buyers testing new angles."],
+    ["pro", "Pro", "$79/mo", 500, "For marketers shipping creatives weekly."],
+    ["agency", "Agency", "$199/mo", 2000, "For teams managing multiple accounts."]
+  ];
+  shell("settings", `
+    <div class="pagehead"><div><h1>Settings</h1></div></div>
+    <div style="max-width:860px;display:grid;gap:20px">
+      <div class="card"><div class="pad"><h3>Account</h3>
+        <div class="kv" style="margin-top:10px">
+          <div><span>Email</span><strong>${esc(S.email)}</strong></div>
+          <div><span>Plan</span><span class="planchip">${esc(S.tier)}</span></div>
+          <div><span>Credits remaining</span><span class="creditnum">${S.credits}</span></div>
+        </div></div></div>
+      <div>
+        <h3 style="margin:0 0 12px;font-size:15px">Plans</h3>
+        <div class="plans">${plans.map(([id, name, price, cr, blurb]) => `
+          <div class="card plan"><div class="pad">
+            <h3>${name}</h3><p class="desc" style="margin-bottom:0">${blurb}</p>
+            <div class="price">${price}</div><div class="cr">${cr} credits / month</div>
+            <button class="btn ${S.tier === id ? "outline" : ""}" data-plan="${id}" data-cr="${cr}" style="width:100%" ${S.tier === id ? "disabled" : ""}>
+              ${S.tier === id ? "Current plan" : "Upgrade to " + name}</button>
+          </div></div>`).join("")}</div>
+      </div>
+      <div class="card"><div class="pad"><h3>Demo controls</h3>
+        <p class="desc">Reset the demo to its original seed data.</p>
+        <button class="btn outline" id="reset">Reset demo data</button></div></div>
+    </div>`);
+
+  document.querySelectorAll("[data-plan]").forEach(b =>
+    b.addEventListener("click", () => {
+      S.tier = b.dataset.plan;
+      S.credits += Number(b.dataset.cr);
+      save(); renderSettings();
+      toast(`In production this opens Stripe Checkout — demo upgraded you to ${b.dataset.plan} and granted ${b.dataset.cr} credits`);
+    }));
+  $("#reset").addEventListener("click", () => {
+    const email = S.email;
+    S = JSON.parse(JSON.stringify(SEED)); S.email = email; save(); renderSettings();
+    toast("Demo data reset");
+  });
+}
+
+/* ============================== boot ============================== */
+window.addEventListener("hashchange", route);
+route();
+</script>
