@@ -1,0 +1,19 @@
+{
+  "name": "meta-ads-studio",
+  "version": "0.1.0",
+  "description": "Track Meta ads performance, browse trending ad creatives, and generate AI ad copy, images, and video",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
