@@ -1,0 +1,26 @@
+# dependencies
+/node_modules
+scraper/.venv
+scraper/__pycache__/
+**/__pycache__/
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+
+# misc
+.DS_Store
+*.pem
+*.log
+
+# env files
+.env
+.env.local
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# supabase
+supabase/.temp
